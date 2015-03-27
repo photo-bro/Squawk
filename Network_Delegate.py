@@ -116,7 +116,6 @@ class Network_Connector:
     # Pre: None
     # Return: True if object is connected, False if not
     def isConnected(self):
-        #print(__isConnected) # trace
         return __isConnected
     
     #######################
@@ -140,7 +139,6 @@ class Network_Connector:
         
         # get message
         message, address = __outSocket.recvfrom(8192)
-        #print(str.format("{0}:{1}","====recvfrom", address_)) # trace
         
         # return message if not empty
         if message:

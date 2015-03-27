@@ -30,6 +30,11 @@ import Network_Delegate
 import CLI
 #import Log
 
+
+
+################
+# Creates separate thread for user input to prevent blocking
+#
 # Concept and code credit:
 # http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
 class InputThread(threading.Thread):
@@ -40,7 +45,7 @@ class InputThread(threading.Thread):
     
     def run(self):
         while self.running:
-            outMessage =  input("=] ")
+            outMessage =  input()
             if outMessage:                           
                 # Don't send empty message
                 try:
@@ -53,8 +58,12 @@ class InputThread(threading.Thread):
     def kill(self):
         self.running = 0
 
+################
+# Creates separate thread for printing incoming messages
+#
+# Concept and code credit:
+# http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
 class ReceiveThread(threading.Thread):
-    
     def __init__(self):
         threading.Thread.__init__(self)
         self.running = 1
