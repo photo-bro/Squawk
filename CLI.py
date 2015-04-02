@@ -26,10 +26,6 @@ import Log
 
 class UI():
     
-    #m_Chatlog = Log.Chatlog()
-    #def __init__(self):
-    #    self.name = "2"
-    
     
     def PeerInfoPrompt(self):
         peer_location = input("Peer location: ")
@@ -37,8 +33,7 @@ class UI():
         if peer_location == "quit":
             quit()
         peer_port = input("Peer port: ")
-        user_handle = input("Your name: ")
-        return Network_Delegate.Peer(peer_location, peer_port, user_handle) 
+        return Network_Delegate.Peer(peer_location, peer_port) 
     
     def DrawMainMenu(self):
         print("╔═══════════════════════════════════════════════════════════════════╗")
