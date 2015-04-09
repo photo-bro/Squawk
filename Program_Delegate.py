@@ -45,7 +45,7 @@ class InputThread(threading.Thread):
     
     def run(self):
         while self.running:
-            outMessage =  input()
+            outMessage =  input("] ")
             if outMessage:                           
                 # Don't send empty message
                 try:
@@ -74,13 +74,16 @@ class ReceiveThread(threading.Thread):
                 # Check for messages
                 inMessage, (inIP, inPort) = Network_Delegate.Network_Connector().GetMessages()
                 # Get sender name
-                if (inIP, inPort) == m_NC.__activePeer.getAddress():
-                    senderName = m_NC.__activePeer.__peerName 
+                #if (inIP, inPort) == m_NC.__activePeer.getAddress():
+                    #senderName = m_NC.__activePeer.__peerName 
                 if inMessage != False:
                     # print Peer information and message received time
                     ct = datetime.today().time()
-                    print(str.format("{0}:{1}:{2} {3}> {4}", ct.hour, ct.minute, ct.second, senderName, inMessage.decode("utf-8")))
-            except:
+                    print(inMessage.decode("utf-8"))
+                    #print(str.format("{0}:{1}:{2} {3}> {4}", ct.hour, ct.minute, ct.second, senderName, inMessage.decode("utf-8")))
+            except Exception as err:
+                raise err
+                #print(err)
                 #print("***No new messages")   #trace
                 pass
             time.sleep(0.1)
@@ -109,7 +112,6 @@ class Program:
         # Prompt for local user name
         local_handle = input("Your name: ")
 
-
         # Try connection
         while (not m_NC.TryConnection(peer) ):
             print("Connection Failed. Try again or type \"quit\" to quit :")
@@ -119,12 +121,11 @@ class Program:
         # Try handshake
         m_NC.Handshake(local_handle)
              
-       
         # Print successful connection    
         print(m_NC.Info())
                
                
-        print(str.format("Active Threads: {0}", threading.active_count())) # trace
+        # print(str.format("Active Threads: {0}", threading.active_count())) # trace
         
         # Setup message retrieve thread
         getMessages = ReceiveThread()
@@ -134,7 +135,7 @@ class Program:
         userInput = InputThread()
         userInput.start()
         
-        #print(str.format("Active Threads: {0}", threading.active_count())) # trace
+        # print(str.format("Active Threads: {0}", threading.active_count())) # trace
         
         running = True
         while running:

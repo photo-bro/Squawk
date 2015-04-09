@@ -42,13 +42,16 @@ class Peer:
     def __str__(self):
         # if not __Addr or not __Port or not __peerName:
         #    return "Not Instantiated"
-        return str.format("{0} at: {1}:{2}", self.__peerName, self.__Addr, self.__Port)
+        return str.format("{0} at {1}:{2}", self.__peerName, self.__Addr, self.__Port)
 
 class Network_Connector:
     
     ################
     # C L A S S    D A T A 
     ###############
+    global __isConnected
+    global __outSocket
+    global __activePeer
     __isConnected = False
     __outSocket = None
     __activePeer = None
@@ -69,9 +72,12 @@ class Network_Connector:
     # Pre: None
     # Return: True if conection successful, False if not
     def TryConnection(self, Peer):
+        global __isConnected
+        global __outSocket
+        global __activePeer
         # Check if there is an active peer
-        if (not self.__activePeer) or (self.__activePeer != Peer):
-            self.__activePeer = Peer
+        if (not __activePeer) or (__activePeer != Peer):
+            __activePeer = Peer
         #print(__activePeer)  #trace
         
         # Create and setup socket
@@ -80,7 +86,7 @@ class Network_Connector:
             self.__outSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Make Socket Reuseable
             self.__outSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # Allow incoming broadcasts
             self.__outSocket.setblocking(False)                                     # Set socket to non-blocking mode
-            self.__outSocket.bind(('', self.__activePeer.getPort()))                     # Accept Connections on port
+            self.__outSocket.bind(('', __activePeer.getPort()))                     # Accept Connections on port
             self.__isConnected = True
         except:
             Exception
@@ -93,22 +99,25 @@ class Network_Connector:
     # Handshake Format:
     # Client Username  
     def Handshake(self, local_handle):
+        global __isConnected
+        global __outSocket
         global __activePeer
+        #global __activePeer
         # Check connection
         if  self.__isConnected == False:
             pass
         
         # Send info
         msg = local_handle
-        self.__outSocket.sendto(bytes(msg, 'utf-8'), self.__activePeer.getAddress())
-        self.__outSocket.sendto(bytes("BEGIN", 'utf-8'), self.__activePeer.getAddress())
+        self.__outSocket.sendto(bytes(msg, 'utf-8'), __activePeer.getAddress())
+        self.__outSocket.sendto(bytes("BEGIN", 'utf-8'), __activePeer.getAddress())
 
         # Wait for info
         getMessage, getAddress = self.__outSocket.recvfrom(8192)
         
         # Assign name
-        __activePeer.__peerName = getMessage.decode("utf-8")
-        print(__activePeer.__peerName) #trace
+        __activePeer = Peer(__activePeer.getAddress()[0], __activePeer.getPort(), getMessage.decode("utf-8"))
+        #print(__activePeer.__peerName) #trace
         
     
     
@@ -133,8 +142,10 @@ class Network_Connector:
     # Pre: Must be connected
     # Return: Messages from Peer
     def GetMessages(self):
+        global __isConnected
         # Check connection
-        if  self.__isConnected == False:
+        if  __isConnected == False:
+            print("NOT CONNECTED GETMESSAGES") #trace
             return False
         
         # get message
@@ -149,7 +160,8 @@ class Network_Connector:
     # Pre: None
     # Return: Connection and object status returned
     def Info(self):
-        return str.format("Connected to {0}", self.__activePeer)
+        global __activePeer
+        return str.format("Connected to {0}", __activePeer)
     
         
     
