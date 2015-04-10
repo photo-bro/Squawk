@@ -69,23 +69,21 @@ class ReceiveThread(threading.Thread):
         self.running = 1
     
     def run(self):
-        while self.running:
-            try:
-                # Check for messages
-                inMessage, (inIP, inPort) = Network_Delegate.Network_Connector().GetMessages()
-                # Get sender name
-                #if (inIP, inPort) == m_NC.__activePeer.getAddress():
-                    #senderName = m_NC.__activePeer.__peerName 
-                if inMessage != False:
-                    # print Peer information and message received time
-                    ct = datetime.today().time()
-                    print(inMessage.decode("utf-8"))
+        while self.running:                # Check for messages
+            inMessage, (inIP, inPort) = Network_Delegate.Network_Connector().GetMessages()
+            # Get sender name
+            #if (inIP, inPort) == m_NC.__activePeer.getAddress():
+                #senderName = m_NC.__activePeer.__peerName 
+            if inMessage != None:
+                # print Peer information and message received time
+                ct = datetime.today().time()
+                print(inMessage.decode("utf-8"))
                     #print(str.format("{0}:{1}:{2} {3}> {4}", ct.hour, ct.minute, ct.second, senderName, inMessage.decode("utf-8")))
-            except Exception as err:
-                raise err
-                #print(err)
-                #print("***No new messages")   #trace
-                pass
+#            except Exception as err:
+#                raise err
+#                #print(err)
+#                #print("***No new messages")   #trace
+#                pass
             time.sleep(0.1)
                 
     
@@ -139,6 +137,7 @@ class Program:
         
         running = True
         while running:
+            time.sleep(5) # no need to run endlessly
             pass
 #            
             # Draw screen

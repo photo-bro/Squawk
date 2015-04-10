@@ -82,38 +82,44 @@ class Network_Connector:
         
         # Create and setup socket
         try:
-            self.__outSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)     # Create Datagram Socket (UDP)
-            self.__outSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Make Socket Reuseable
-            self.__outSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # Allow incoming broadcasts
-            self.__outSocket.setblocking(False)                                     # Set socket to non-blocking mode
-            self.__outSocket.bind(('', __activePeer.getPort()))                     # Accept Connections on port
-            self.__isConnected = True
-        except:
-            Exception
+            __outSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)     # Create Datagram Socket (UDP)
+            __outSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Make Socket Reuseable
+            __outSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # Allow incoming broadcasts
+            __outSocket.setblocking(False)                                     # Set socket to non-blocking mode
+            __outSocket.bind(('', __activePeer.getPort()))                     # Accept Connections on port
+            __isConnected = True
+        except Exception as e:
+            print(e)
             # socket creation failed
-            self.__isConnected = False
+            __isConnected = False
             
-        return self.__isConnected
+        return __isConnected
     
     
     # Handshake Format:
     # Client Username  
     def Handshake(self, local_handle):
-        global __isConnected
-        global __outSocket
         global __activePeer
+        global __outSocket
+        global __isConnected
         #global __activePeer
         # Check connection
-        if  self.__isConnected == False:
+        if  __isConnected == False:
             pass
         
         # Send info
         msg = local_handle
-        self.__outSocket.sendto(bytes(msg, 'utf-8'), __activePeer.getAddress())
-        self.__outSocket.sendto(bytes("BEGIN", 'utf-8'), __activePeer.getAddress())
+        __outSocket.sendto(bytes(msg, 'utf-8'), __activePeer.getAddress())
+        #__outSocket.sendto(bytes("BEGIN", 'utf-8'), __activePeer.getAddress())
 
+        getMessage = None
+        
         # Wait for info
-        getMessage, getAddress = self.__outSocket.recvfrom(8192)
+        while (getMessage == None):
+            try:
+                getMessage, getAddress = __outSocket.recvfrom(8192)
+            except:
+                pass
         
         # Assign name
         __activePeer = Peer(__activePeer.getAddress()[0], __activePeer.getPort(), getMessage.decode("utf-8"))
@@ -125,17 +131,17 @@ class Network_Connector:
     # Pre: None
     # Return: True if object is connected, False if not
     def isConnected(self):
-        return self.__isConnected
+        return __isConnected
     
     #######################
     # Pre: Must be connected
     # Return: Message has been set
     def SendMessage(self, message):
         # Check connection
-        if  self.__isConnected == False:
+        if  __isConnected == False:
             return False
         # Send message
-        self.__outSocket.sendto(bytes(message, 'utf-8'), self.__activePeer.getAddress())
+        __outSocket.sendto(bytes(message, 'utf-8'), self.__activePeer.getAddress())
 
         
     #######################
@@ -143,16 +149,25 @@ class Network_Connector:
     # Return: Messages from Peer
     def GetMessages(self):
         global __isConnected
+        global __outSocket
         # Check connection
         if  __isConnected == False:
             print("NOT CONNECTED GETMESSAGES") #trace
             return False
         
+        message = None
+        
         # get message
-        message, address = self.__outSocket.recvfrom(8192)
+        try:
+            message, address = __outSocket.recvfrom(8192)
+        except Exception as e:
+            # No message
+            print(e) #trace
+            return None, (None, None)
+            
         
         # return message if not empty
-        if message:
+        if message != None:
             #print("--There is a message") #trace
             return (message, address) 
         
