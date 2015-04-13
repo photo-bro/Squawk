@@ -85,7 +85,7 @@ class Network_Connector:
             __outSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)     # Create Datagram Socket (UDP)
             __outSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Make Socket Reuseable
             __outSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)  # Allow incoming broadcasts
-            __outSocket.setblocking(False)                                     # Set socket to non-blocking mode
+            __outSocket.setblocking(True)                                     # Set socket to non-blocking mode
             __outSocket.bind(('', __activePeer.getPort()))                     # Accept Connections on port
             __isConnected = True
         except Exception as e:
@@ -113,12 +113,16 @@ class Network_Connector:
         #__outSocket.sendto(bytes("BEGIN", 'utf-8'), __activePeer.getAddress())
 
         getMessage = None
+        print("Waiting for another user")
+
         
         # Wait for info
         while (getMessage == None):
             try:
+                print(".", end=" ")
                 getMessage, getAddress = __outSocket.recvfrom(8192)
-            except:
+            except Exception as e:
+                print("Handshake: {0}".format(e)) #trace
                 pass
         
         # Assign name

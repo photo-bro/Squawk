@@ -21,7 +21,7 @@
 ###################################################
 
 # System imports
-import time, threading
+import time, threading, os, sys
 from datetime import datetime
 
 
@@ -73,17 +73,15 @@ class ReceiveThread(threading.Thread):
             inMessage, (inIP, inPort) = Network_Delegate.Network_Connector().GetMessages()
             # Get sender name
             #if (inIP, inPort) == m_NC.__activePeer.getAddress():
-                #senderName = m_NC.__activePeer.__peerName 
+            #    senderName = m_NC.__activePeer.__peerName 
             if inMessage != None:
                 # print Peer information and message received time
                 ct = datetime.today().time()
-                print(inMessage.decode("utf-8"))
-                    #print(str.format("{0}:{1}:{2} {3}> {4}", ct.hour, ct.minute, ct.second, senderName, inMessage.decode("utf-8")))
-#            except Exception as err:
-#                raise err
-#                #print(err)
-#                #print("***No new messages")   #trace
-#                pass
+                print(inMessage.decode('utf-8'))
+                #print(str.format("{0}:{1}:{2} {3}> {4}", ct.hour, ct.minute, ct.second, senderName, inMessage.decode("utf-8")))
+            #except Exception as e:
+              #  print(e)
+                #print("***No new messages")   #trace
             time.sleep(0.1)
                 
     
@@ -133,7 +131,7 @@ class Program:
         userInput = InputThread()
         userInput.start()
         
-        # print(str.format("Active Threads: {0}", threading.active_count())) # trace
+        print(str.format("Active Threads: {0}", threading.active_count())) # trace
         
         running = True
         while running:
