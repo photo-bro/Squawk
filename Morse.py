@@ -22,8 +22,6 @@
 
 class Morse(object):
 
-
-
     def __init__(self):
         self.MorseDict = {'a':'• −',     
                           'b':'− • • •',    
@@ -75,7 +73,7 @@ class Morse(object):
 
     
     def TextToMorse(self, text):
-        s = ''
+        s = ''          # 
         for c in text.lower():
             if c == ' ':
                 s += '     ' # 7 spaces between words
@@ -83,5 +81,18 @@ class Morse(object):
             s += self.MorseDict[c]
             s += '   '  # 3 spaces between characters in a word
         return s
+    
+    
+    def MorseToText(self, msg):
+        s = ''
+        for c in msg:
+            s += self.__MorseCharToText(c)    
+        return s    
+    
 
-        
+    def __MorseCharToText(self, char):
+        # Find key from value in dictionary
+        # Dictionary might not be the best data structure for this.... oh whale
+        for k, v in self.MorseDict.items():
+            if char == v:
+                return k
