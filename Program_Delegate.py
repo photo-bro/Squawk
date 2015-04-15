@@ -28,6 +28,7 @@ from datetime import datetime
 # Local imports
 import Network_Delegate
 import CLI
+import Morse
 #import Log
 
 
@@ -97,6 +98,9 @@ class Program:
     m_NC = Network_Delegate.Network_Connector()
     
     def ProgramEntry(self):
+        
+        m = Morse.Morse()
+        print(m.TextToMorse("Hello World"))
         
         # Draw menu
         m_CLI.DrawMainMenu()
