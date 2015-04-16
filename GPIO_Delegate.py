@@ -42,14 +42,17 @@ class GPIO_Delegate(object):
                 GPIO.output(self.channel, True)
                 time.sleep(1 * self.count)
                 pass
-            if c == '-':  # On for 3 count
+            elif c == '-':  # On for 3 count
                 GPIO.output(self.channel, True)
                 time.sleep(3 * self.count)
                 pass
-            if c == ' ':  # On for 1 count
+            elif c == ' ':  # On for 1 count
                 GPIO.output(self.channel, True)   
-                time.sleep(1 * self.count)             
-                pass
+                time.sleep(1 * self.count)  
+            else:
+                # error, non morse char
+                # skip over it
+                continue           
             GPIO.output(11, False)
 
     # Check if dot or dash

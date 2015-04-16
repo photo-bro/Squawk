@@ -26,7 +26,7 @@ from datetime import datetime
 
 
 # Local imports
-import Network_Delegate
+import Network_Delegate, GPIO_Delegate
 import CLI
 import Morse
 #import Log
@@ -100,7 +100,11 @@ class Program:
     def ProgramEntry(self):
         
         m = Morse.Morse()
-        print(m.TextToMorse("Hello World"))
+        s = m.TextToMorse("Hello World")
+        print(s)
+        
+        gp  = GPIO_Delegate.GPIO()
+        gp.SendMorse(s)
         
         # Draw menu
         m_CLI.DrawMainMenu()

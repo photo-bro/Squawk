@@ -22,7 +22,7 @@
 
 # System imports
 import socket
-class Peer:
+class Peer(object):
     
     def __init__(self, addr, port, name = "none"):
         # Assign values from constructor
@@ -44,7 +44,7 @@ class Peer:
         #    return "Not Instantiated"
         return str.format("{0} at {1}:{2}", self.__peerName, self.__Addr, self.__Port)
 
-class Network_Connector:
+class Network_Connector(object):
     
     ################
     # C L A S S    D A T A 
