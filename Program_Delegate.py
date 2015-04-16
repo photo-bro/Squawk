@@ -103,7 +103,7 @@ class Program:
         s = m.TextToMorse("Hello World")
         print(s)
         
-        gp  = GPIO_Delegate.GPIO()
+        gp  = GPIO_Delegate.GPIO_Delegate()
         gp.SendMorse(s)
         
         # Draw menu

@@ -28,13 +28,14 @@ import Morse
 class GPIO_Delegate(object):
 
 
-    def __init__(self, channel = 11, count = 1):
+    def __init__(self, channel = 11, count = .5):
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(channel, GPIO.OUT)
         self.count = count      # seconds
         self.channel = channel  # pin on board
         pass
     
+    # Best if run on separate thread 
     def SendMorse(self, msg):
         msg += '@' # add end transmission char to message
         for c in msg:
