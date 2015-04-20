@@ -58,6 +58,8 @@ class GPIO_Delegate(object):
                 # skip over it
                 continue           
             GPIO.output(11, False)
+            GPIO.cleanup()  # clean up before exiting
+
 
     # Check if dot or dash
     # Build char (series of dot/dosh) until word break
