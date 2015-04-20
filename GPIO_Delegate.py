@@ -28,11 +28,14 @@ import Morse
 class GPIO_Delegate(object):
 
 
-    def __init__(self, channel = 11, count = .5):
+    def __init__(self, channel_out = 11, channel_in = 0, count = .5):
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(channel, GPIO.OUT)
-        self.count = count      # seconds
-        self.channel = channel  # pin on board
+        GPIO.setup(channel_out, GPIO.OUT)
+        GPIO.setwarnings(False)
+        
+        self.count = count      # in seconds
+        self.channel_out = channel_out  
+        self.channel_in = channel_in
         pass
     
     # Best if run on separate thread 
@@ -40,15 +43,15 @@ class GPIO_Delegate(object):
         msg += '@' # add end transmission char to message
         for c in msg:
             if c == '•':  # On for 1 count
-                GPIO.output(self.channel, True)
+                GPIO.output(self.channel_out, True)
                 time.sleep(1 * self.count)
                 pass
             elif c == '-':  # On for 3 count
-                GPIO.output(self.channel, True)
+                GPIO.output(self.channel_out, True)
                 time.sleep(3 * self.count)
                 pass
             elif c == ' ':  # On for 1 count
-                GPIO.output(self.channel, True)   
+                GPIO.output(self.channel_out, True)   
                 time.sleep(1 * self.count)  
             else:
                 # error, non morse char
@@ -66,6 +69,7 @@ class GPIO_Delegate(object):
         while c != '@': # @ is end char
             s += c               # add current char to message
             c = self.GetChar()   # get next char
+        GPIO.cleanup()  # clean up before exiting
         return s
     
     def GetChar(self):
@@ -78,12 +82,14 @@ class GPIO_Delegate(object):
         
     def GetDotOrDash(self):
         # loop until signal comes in
-        while GPIO.input(self.channel) == False:
-            GPIO.input(self.channel)
+        while GPIO.input(self.channel_in) == False:
+            GPIO.input(self.channel_in)
+            time.sleep(self.count / 10)    # delay loop slightly
         Start = time.time()                # beginning of dot/dash
         # loop until signal ends
-        while GPIO.input(self.channel) == True:      
-            GPIO.input(self.channel)
+        while GPIO.input(self.channel_in) == True:      
+            GPIO.input(self.channel_in)
+            time.sleep(self.count / 10)    # delay loop slightly
         End = time.time()                  # end of dot/dash
         # duration of signal in seconds
         Dur = End - Start
