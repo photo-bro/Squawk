@@ -49,20 +49,15 @@ class GPIO_Delegate(object):
         try:
             for c in msg:
                 if c == '•':  # On for 1 count
-                    print(c)  #trace
                     GPIO.output(self.channel_out, True)
                     time.sleep(1 * self.count)
                 elif c == '−':  # On for 3 count
-                    print(c)  #trace
                     GPIO.output(self.channel_out, True)
                     time.sleep(3 * self.count)
                 elif c == ' ':  # On for 1 count
-                    print()  #trace
-                    #GPIO.output(self.channel_out, True)   
                     time.sleep(1 * self.count)
                 else:
-                    print('\a')  #trace beep
-                    time.sleep(1 * self.count)
+                    pass
                 GPIO.output(self.channel_out, False)
         finally:
             GPIO.cleanup()  # clean up before exiting
