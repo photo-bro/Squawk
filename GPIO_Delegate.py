@@ -25,13 +25,16 @@ import RPi.GPIO as GPIO
 import time, os
 import Morse
 
+#import pdb #debug
+
 class GPIO_Delegate(object):
 
 
-    def __init__(self, channel_out = 11, channel_in = 0, count = .5):
+    def __init__(self, channel_out = 11, channel_in = 12, count = .1):
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(channel_out, GPIO.OUT)
-        GPIO.setwarnings(False)
+        GPIO.setup(channel_out, GPIO.OUT, 0)
+        GPIO.setup(channel_in, GPIO.IN)
+        GPIO.setwarnings(True)      # for debug
         
         self.count = count      # in seconds
         self.channel_out = channel_out  
@@ -40,24 +43,28 @@ class GPIO_Delegate(object):
     
     # Best if run on separate thread 
     def SendMorse(self, msg):
-        msg += '@' # add end transmission char to message
-        for c in msg:
-            if c == '•':  # On for 1 count
-                GPIO.output(self.channel_out, True)
-                time.sleep(1 * self.count)
-                pass
-            elif c == '-':  # On for 3 count
-                GPIO.output(self.channel_out, True)
-                time.sleep(3 * self.count)
-                pass
-            elif c == ' ':  # On for 1 count
-                GPIO.output(self.channel_out, True)   
-                time.sleep(1 * self.count)  
-            else:
-                # error, non morse char
-                # skip over it
-                continue           
-            GPIO.output(11, False)
+        print(msg)  #trace
+        #msg += '@' # add end transmission char to message
+        #pdb.set_trace()
+        try:
+            for c in msg:
+                if c == '•':  # On for 1 count
+                    print(c)  #trace
+                    GPIO.output(self.channel_out, True)
+                    time.sleep(1 * self.count)
+                elif c == '−':  # On for 3 count
+                    print(c)  #trace
+                    GPIO.output(self.channel_out, True)
+                    time.sleep(3 * self.count)
+                elif c == ' ':  # On for 1 count
+                    print()  #trace
+                    #GPIO.output(self.channel_out, True)   
+                    time.sleep(1 * self.count)
+                else:
+                    print('\a')  #trace beep
+                    time.sleep(1 * self.count)
+                GPIO.output(self.channel_out, False)
+        finally:
             GPIO.cleanup()  # clean up before exiting
 
 

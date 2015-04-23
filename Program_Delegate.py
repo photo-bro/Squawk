@@ -100,11 +100,10 @@ class Program:
     def ProgramEntry(self):
         
         m = Morse.Morse()
-        s = m.TextToMorse("Hello World")
-        print(s)
-        
         gp  = GPIO_Delegate.GPIO_Delegate()
+        s = m.TextToMorse("Hello World")
         gp.SendMorse(s)
+        print(s)
         
         # Draw menu
         m_CLI.DrawMainMenu()

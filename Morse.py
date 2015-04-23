@@ -78,8 +78,12 @@ class Morse(object):
             if c == ' ':
                 s += '     ' # 7 spaces between words
                 continue
-            s += self.MorseDict[c]
-            s += '   '  # 3 spaces between characters in a word
+            try:
+                s += self.MorseDict[c]
+                s += '   '  # 3 spaces between characters in a word
+            except e:
+                # invalid letter, assume blank
+                pass
         return s
     
     
