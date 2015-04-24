@@ -44,7 +44,7 @@ class UI():
         print("║    ███████║╚██████╔╝╚██████╔╝██║  ██║╚███╔███╔╝██║  ██╗           ║")
         print("║    ╚══════╝ ╚══▀▀═╝  ╚═════╝ ╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝  ╚═╝           ║")
         print("║                                                                   ║")
-        print("║      \"A morse code based peer to peer chat client\"              ║")
+        print("║      \"A morse code based peer to peer chat client\"                ║")
         print("║                                                                   ║")
         print("║     Created by Josh Harmon                                        ║")
         print("╚═══════════════════════════════════════════════════════════════════╝")

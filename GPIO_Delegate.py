@@ -85,6 +85,8 @@ class GPIO_Delegate(object):
         return c
         
     def GetDotOrDash(self):
+        # Setup channel
+        GPIO.setup(channel_in, GPIO.IN)
         # loop until signal comes in
         while GPIO.input(self.channel_in) == False:
             GPIO.input(self.channel_in)
