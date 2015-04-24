@@ -25,7 +25,7 @@ import time, threading, os, sys
 from datetime import datetime
 
 # Local imports
-import Network_Delegate, GPIO_Delegate
+import Network_Delegate, IO_Delegate
 import CLI
 import Morse
 
@@ -41,7 +41,7 @@ class InputThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.running = 1
-        self.GP = GPIO_Delegate.GPIO_Delegate()
+        self.GP = IO_Delegate.GPIO_Delegate()
         self.M = Morse.Morse()
     
     def run(self):
@@ -73,7 +73,7 @@ class ReceiveThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.running = 1
-        self.GP = GPIO_Delegate.GPIO_Delegate()
+        self.GP = IO_Delegate.GPIO_Delegate()
         self.M = Morse.Morse()
     
     def run(self):
