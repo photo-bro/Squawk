@@ -41,7 +41,7 @@ class InputThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.running = 1
-        self.GP = IO_Delegate.GPIO_Delegate()
+        self.IO = IO_Delegate.IO_Delegate()
         self.M = Morse.Morse()
     
     def run(self):
@@ -50,13 +50,13 @@ class InputThread(threading.Thread):
             if outMessage:       
                 # easy exit    
                 if outMessage == "quit":
-                    quit()                
+                    os._exit(1)                
                 # Don't send empty message
                 try:
                     #pdb.set_trace()
                     morse = self.M.TextToMorse(outMessage)
-                    print(morse)  # trace
-                    self.GP.SendMorse(morse)
+                    print(str.format("Sending message: {0}", morse))
+                    self.IO.SendMorse(morse)
                 except:
                     Exception
             time.sleep(0.1)
@@ -73,23 +73,27 @@ class ReceiveThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.running = 1
-        self.GP = IO_Delegate.GPIO_Delegate()
+        self.IO = IO_Delegate.IO_Delegate()
         self.M = Morse.Morse()
     
     def run(self):
-        while self.running:                # Check for messages
-            inMorse = self.GP.ReceiveMorse()
+        while self.running:
+            # Check for messages
+            inMorse = self.IO.ReceiveMorse()
             if inMorse != None:
                 # print Peer information and message received time
                 ct = datetime.today().time()
                 msg = self.M.MorseToText(inMorse)
-                print(str.format("{0}: {1}\n{2}", ct, inMorse, msg))
+                print(str.format("{0}: {1}\n= {2}", ct, inMorse, msg))
             time.sleep(0.1)       
     
     def kill(self):
         self.running = 0
         
 def Program(self):
+    
+    # Clear screen
+    os.system("clear")
     
     # Draw menu
     CLI.UI().DrawMainMenu()
@@ -100,19 +104,22 @@ def Program(self):
     getMessages = ReceiveThread()
     getMessages.start()
     
+    # Test message for receive thread TRACE
+    io = IO_Delegate.IO_Delegate()
+    m = Morse.Morse()
+    #io.SendMorse(m.TextToMorse("Hello"))
+    
     # Setup input thread
     userInput = InputThread()
     userInput.start()
     
     # print(str.format("Active Threads: {0}", threading.active_count())) # trace
     
+    # have parent thread loop until time to kill
     running = True
     while running:
-        time.sleep(5) # no need to run endlessly
+        time.sleep(5) # no need to tie up cpu resources
         pass
-#            
-        # Draw screen
-        #m_CLI.DrawChat()
         
     getMessages.kill()
     userInput.kill()
