@@ -73,24 +73,29 @@ class Morse(object):
 
     
     def TextToMorse(self, text):
-        s = ''          # 
-        for c in text.lower():
-            if c == ' ':
-                s += '     ' # 7 spaces between words
-                continue
-            try:
-                s += self.MorseDict[c]
-                s += '   '  # 3 spaces between characters in a word
-            except e:
-                # invalid letter, assume blank
-                pass
+        s = '' 
+        # split message into words         
+        for w in text.split():
+            # convert each char in each word
+            for c in w.lower():
+                try:
+                    s += self.MorseDict[c]
+                    s += '   '  # 3 spaces between characters in a word
+                except e:
+                    # invalid letter, assume blank
+                    pass
+            # 7 spaces (each space is 1 count) between words
+            s += '       ' 
         return s
     
     
     def MorseToText(self, msg):
         s = ''
-        for c in msg:
-            s += self.__MorseCharToText(c)    
+        # Split message into groups of individual words
+        for w in msg.split("       "):  # 7 spaces between words
+            # Split word into groups of individual chars
+            for c in w.split("   "):    # 3 spaces between chars
+                s += self.__MorseCharToText(c)    
         return s    
     
 
@@ -100,3 +105,5 @@ class Morse(object):
         for k, v in self.MorseDict.items():
             if char == v:
                 return k
+            else:
+                return ""

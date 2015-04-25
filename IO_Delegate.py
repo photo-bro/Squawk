@@ -55,12 +55,11 @@ class IO_Delegate(object):
     # Best if run on separate thread 
     def SendMorse(self, msg):
         # Make sure output is low
-        GPIO.output(self.channel_out, False) if (self.mode == "gp") else pfio.digital_write(self.channel_out, 1)
+        #GPIO.output(self.channel_out, False) if (self.mode == "gp") else pfio.digital_write(self.channel_out, 1)
        
         msg += '• − − • − •' # add '@' (in morse), end transmission char to message
         #pdb.set_trace()
         try:
-            # split into words first
             for c in msg:
                 if c == '•':  # On for 1 count
                     GPIO.output(self.channel_out, True) if (self.mode == "gp") else pfio.digital_write(self.channel_out, 0)
@@ -82,13 +81,13 @@ class IO_Delegate(object):
 
 
     # Check if dot or dash
-    # Build char (series of dot/dosh) until word break
+    # Build char (series of dot/dash) until word break
     # Build word until space ' ' is found
     # Build message until '@' char is found
     def ReceiveMorse(self):
         #pdb.set_trace()
         c = ''      # current char received
-        s = ''      # current messsage
+        s = ''      # current message
         run = True
         while run: 
             s += c                 # add current char to message
