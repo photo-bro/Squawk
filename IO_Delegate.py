@@ -84,7 +84,7 @@ class IO_Delegate(object):
     # Build char (series of dot/dash) until word break
     # Build word until space ' ' is found
     # Build message until '@' char is found
-    def ReceiveMorse(self):
+    def xReceiveMorse(self):
         #pdb.set_trace()
         c = ''      # current char received
         s = ''      # current message
@@ -98,6 +98,12 @@ class IO_Delegate(object):
         if self.mode == "gp" :
             GPIO.cleanup()  # clean up before exiting
         return s
+    
+    def ReceiveMorse(self):
+        raw = self.__PF_GetRawMessage()
+        print(str.format("Raw: {0}",raw)) #trace
+        m = self.RawToMorse(raw)
+        return m
     
     def __GetChar(self):
         c = ''      # current char being received
@@ -117,6 +123,86 @@ class IO_Delegate(object):
             ch += c[i] + ' '
         return ch
     
+    def __GetMorse(self):
+        s = ''
+        d = ''
+        while d != chr(0x17):  # 0x17 is EOT char in UTF-8
+            s += d
+            d = self.__PF_GetDotOrDash()
+            print(d) #trace
+        return s
+    
+    def __PF_GetRawMessage(self):
+        receiving = True
+        s = ''
+        # Start at edge trigger
+        while pfio.digital_read(self.channel_in) == 1:
+            pfio.digital_read(self.channel_in)
+            time.sleep(self.count / 10)    # delay loop slightly
+            
+        # Check every count if hi or low
+        while receiving:
+            # Write state to string
+            if pfio.digital_read(self.channel_in) == 1:
+                s += '0'
+            else:
+                s += '1'
+            #print(pfio.digital_read(self.channel_in)) # trace
+            # exit if last 10 counts l
+            if s[-10:] == "0000000000":
+                receiving = False
+            time.sleep(self.count)  # sleep rest of count
+        # remove last 10 items and return
+        return s[:-10] 
+    
+    def RawToMorse(self, raw):
+        m = ''
+        # split into words
+        for i in range(len(raw)):
+            if raw[i] == '1':
+                if raw[i+1] == '1' and raw[i+2] == '1':
+                    m += '−'
+                    i += 2 # consume two spots
+                    i += 1 # consume following 0
+                else:
+                    m += '•'
+                    i += 1 # consume following 0
+                m += ' '   # space between blips in char
+            if raw[i] == '0':
+                if raw[i+1] == '0' and raw[i+2] == '0':
+                    m += '  '  # add 2 spaces (assuming one already added) between char in word
+                    i += 2 # consume the two spaces
+                    if raw[i+3] == '0' and raw[i+4] == '0' and raw[i+5] == '0' and raw[i+6] == '0':
+                        m += '    '  # add 4 more spaces (7 total) between words
+                        i += 4 # consume the seven spaces
+            
+            
+
+
+#        for w in raw.split('0000000'):
+#            # split into chars
+#            for c in w.split('000'):
+#                # split into blips
+#                for i in range(len(c)):
+#                    if c[i] == '1':
+#                        if (i+2) < len(c) and c[i+1] == '1' and c[i+2] == '1':
+#                            m += '−'
+#                            # one space between each blip in a char
+#                            # unless at end of char
+##                            if (i+5) < len(c) and c[i+5] != '0':
+##                                m += ' ' # one space between each blip in a char
+#                            i += 2   # skip over next 2 blips
+#                            continue
+#                        m += '•'
+#                        # one space between each blip in a char
+#                        # unless at end of char
+##                        if (i+3) < len(c) and c[i+3] != '0':
+##                            m += ' '                              
+#                m += '  '  # three spaces between chars
+#            m += '       ' # seven spaces between words
+        return m
+        
+    
     def __PF_GetDotOrDash(self):
         # loop until signal comes in
         while pfio.digital_read(self.channel_in) == 1:
@@ -130,15 +216,17 @@ class IO_Delegate(object):
         End = time.time()                  # end of dot/dash
         # duration of signal in seconds
         Dur = End - Start
-        # convert duration to ct
+        # convert duration to counts
         ct = Dur / self.count
         # check if dot, dash, or word break based on count
         if ct >= 0 and ct < 3:
-            return '•'
+            return '• '
         elif ct >= 3 and ct < 7:
-            return '-'
-        elif ct >= 7:
+            return '- '
+        elif ct >= 7 and ct < 10:
             return ' '
+        elif ct >= 10:      # end transmission
+            return chr(0x17)
         
     def __GP_GetDotOrDash(self):
         # Setup channel

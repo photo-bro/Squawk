@@ -101,17 +101,20 @@ def Program(self):
     # print(str.format("Active Threads: {0}", threading.active_count())) # trace
         
     # Setup message retrieve thread
-    getMessages = ReceiveThread()
-    getMessages.start()
+    #getMessages = ReceiveThread()
+    #getMessages.start()
     
     # Test message for receive thread TRACE
     io = IO_Delegate.IO_Delegate()
     m = Morse.Morse()
     #io.SendMorse(m.TextToMorse("Hello"))
+    print(m.TextToMorse("Hello"))
+    a = io.RawToMorse('101010100001000010111010100001011101010000111011101110')
+    print(a)
     
     # Setup input thread
-    userInput = InputThread()
-    userInput.start()
+    #userInput = InputThread()
+    #userInput.start()
     
     # print(str.format("Active Threads: {0}", threading.active_count())) # trace
     

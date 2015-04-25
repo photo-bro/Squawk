@@ -92,9 +92,9 @@ class Morse(object):
     def MorseToText(self, msg):
         s = ''
         # Split message into groups of individual words
-        for w in msg.split("       "):  # 7 spaces between words
+        for w in msg.split('       '):  # 7 spaces between words
             # Split word into groups of individual chars
-            for c in w.split("   "):    # 3 spaces between chars
+            for c in w.split('   '):    # 3 spaces between chars
                 s += self.__MorseCharToText(c)    
         return s    
     
