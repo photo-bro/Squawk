@@ -31,17 +31,16 @@ import Morse
 
 import pdb #debug
 
-
 ################
 # Creates separate thread for user input to prevent blocking
 #
 # Concept and code credit:
 # http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
 class InputThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, count = .5):
         threading.Thread.__init__(self)
         self.running = 1
-        self.IO = IO_Delegate.IO_Delegate()
+        self.IO = IO_Delegate.IO_Delegate(count)
         self.M = Morse.Morse()
     
     def run(self):
@@ -57,6 +56,7 @@ class InputThread(threading.Thread):
                     morse = self.M.TextToMorse(outMessage)
                     print(str.format("Sending message: {0} => {1}", outMessage, morse))
                     self.IO.SendMorse(morse)
+                    print("Sent.")
                 except:
                     Exception
             time.sleep(0.1)
@@ -70,10 +70,10 @@ class InputThread(threading.Thread):
 # Concept and code credit:
 # http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
 class ReceiveThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, count = .5):
         threading.Thread.__init__(self)
         self.running = 1
-        self.IO = IO_Delegate.IO_Delegate()
+        self.IO = IO_Delegate.IO_Delegate(count)
         self.M = Morse.Morse()
     
     def run(self):
@@ -83,7 +83,9 @@ class ReceiveThread(threading.Thread):
             if inMorse != None:
                 ct = datetime.today().time()
                 msg = self.M.MorseToText(inMorse)
-                print(str.format("\n{0}:{1}:{2} : {3} = {4}", ct.hour, ct.minute, ct.second, inMorse, msg))
+                print(str.format("\nReceived Message at {0}:{1}:{2} : {3} \nMessage: {4}", 
+                                 ct.hour, ct.minute, ct.second, inMorse, msg.upper()))
+                sys.stdout.flush()
             time.sleep(0.1)       
     
     def kill(self):
@@ -97,40 +99,34 @@ def Program(self):
     # Draw menu
     CLI.UI().DrawMainMenu()
     
-    # print(str.format("Active Threads: {0}", threading.active_count())) # trace
-        
+    # Request count length
+    count = input("Count Length: ")
+    
+    # Init IO
+    IO_Delegate.IO_Delegate().Setup()
+            
     # Setup message retrieve thread
-    getMessages = ReceiveThread()
+    getMessages = ReceiveThread(float(count))
     getMessages.start()
     
-    # Test message for receive thread TRACE
-#    io = IO_Delegate.IO_Delegate()
-#    m = Morse.Morse()
-#    io.SendMorse(m.TextToMorse("Hello")) # Trace
-#    msg = m.MorseToText('• − −   • • • •   • −   −          • •   • • •          • − • •   − − −   • • • −   •')
-#    print('• − −   • • • •   • −   −          • •   • • •          • − • •   − − −   • • • −   •')
-#    print(              '10111011100010101010001011100011100000001010001010100000001011101010001110111011100010101011100010')
-#    print(io.RawToMorse('10111011100010101010001011100011100000001010001010100000001011101010001110111011100010101011100010'))
-#    print(msg)
-#    quit()
-
-    
     # Setup input thread
-    userInput = InputThread()
+    userInput = InputThread(float(count))
     userInput.start()
-    
-    # print(str.format("Active Threads: {0}", threading.active_count())) # trace
-    
+        
     # have parent thread loop until time to kill
     running = True
     while running:
         time.sleep(5) # no need to tie up cpu resources
         pass
         
+    # kill threads    
     getMessages.kill()
     userInput.kill()
         
-    # Exit on disconnect
+    # Cleanup IO
+    IO_Delegate.IO_Delegate().Cleanup()
+    
+    # Exit
     quit()
 
 # Start program

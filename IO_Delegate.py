@@ -28,11 +28,14 @@ import Morse
 
 import pdb #debug
 
+
+
+
 class IO_Delegate(object):
 
-    def __init__(self, channel_out = 7, channel_in = 0, count = .1):
+    def __init__(self, count = .5, channel_out = 7, channel_in = 0):
         # setup proper io system
-        pfio.init()
+        #pfio.init()
     
         # class variables         
         self.count = count      # in seconds
@@ -42,34 +45,46 @@ class IO_Delegate(object):
         # Make sure output is low
         #pfio.digital_write(self.channel_out, 1)
     
+    def Setup(self):
+        #   Not in constructor because it only needs to be called from the 
+        # first instance
+        pfio.init()
+        pfio.digital_write(self.channel_out, 1)
+    
+    def Cleanup(self):
+        pfio.deinit()
+        
     # Best if run on separate thread 
     def SendMorse(self, msg):
         # Make sure output is low
-        pfio.digital_write(self.channel_out, 1)
+        #pfio.digital_write(self.channel_out, 1)
        
-        msg += '• − − • − •' # add '@' (in morse), end transmission char to message
-        try:
-            for c in msg:
-                if c == '•':  # On for 1 count
-                    pfio.digital_write(self.channel_out, 0)
-                    time.sleep(1 * self.count)
-                elif c == '−':  # On for 3 count
-                    pfio.digital_write(self.channel_out, 0)
-                    time.sleep(3 * self.count)
-                elif c == ' ':  # 1 count for space
-                    time.sleep(1 * self.count)
-                else:
-                    pass
-                pfio.digital_write(self.channel_out, 1)
-        finally:
-            # Make sure output is low
+        # add space to beginning of message to ensure data goes through
+        # add  end transmission char to message
+        msg = '• • •' + msg + '• • • − • −' 
+        for c in msg:
+            if c == '•':  # On for 1 count
+                pfio.digital_write(self.channel_out, 0)
+                time.sleep(1 * self.count)
+            elif c == '−':  # On for 3 count
+                pfio.digital_write(self.channel_out, 0)
+                time.sleep(3 * self.count)
+            elif c == ' ':  # 1 count for space
+                time.sleep(1 * self.count)
+            else:
+                pass
+            # set low at end of each loop
             pfio.digital_write(self.channel_out, 1)
+            
+        # set low before exit
+        pfio.digital_write(self.channel_out, 1)
     
     def ReceiveMorse(self):
         raw = self._GetRawMessage()
         m = self._RawToMorse(raw)
-        if m[-11:] == '• − − • − •':
-            return m[:-11]
+        # check if valid message (check EOT char)
+        if m[-11:] == '• • • − • −':
+            return m[:-11] # return without EOT char
         else:
             return None
     
@@ -84,18 +99,19 @@ class IO_Delegate(object):
         # Check every count if hi or low
         while receiving:
             # Write state to string
-            if pfio.digital_read(self.channel_in) == 1:
-                s += '0'
-            else:
+            if pfio.digital_read(self.channel_in) == 0:
                 s += '1'
-            # print(pfio.digital_read(self.channel_in)) # trace
-            # exit if last 15 counts l
-            if s[-15:] == "000000000000000":
+            else:
+                s += '0'
+
+            # exit if last 10 counts l
+            if s[-10:] == "0000000000":
                 receiving = False
+                break
+            
             time.sleep(self.count)  # sleep rest of count
-        # remove last 15 items and return
-        return s[:-15] 
-    
+        # remove last 10 items and return
+        return s[6:-10] 
     
     # Parse raw values from input into properly formatted morse code
     def _RawToMorse(self, raw):
@@ -104,8 +120,6 @@ class IO_Delegate(object):
         # '1'       = '•'
         # '111'     = '−'
         # '0'       = ' '
-        # '000'     = '   '
-        # '0000000' = '       ' 
         while i < len(raw):
             if raw[i] == '0':
                 m += ' '
