@@ -109,9 +109,10 @@ def Program(self):
     m = Morse.Morse()
     #io.SendMorse(m.TextToMorse("Hello"))
     print(m.TextToMorse("Hello"))
-    a = io.RawToMorse('101010100001000010111010100001011101010000111011101110')
+    a = io.RawToMorse('10101010001000101110101000101110101000111011101110')
+    print('10101010001000101110101000101110101000111011101110')
     print(a)
-    
+    quit() # trace
     # Setup input thread
     #userInput = InputThread()
     #userInput.start()

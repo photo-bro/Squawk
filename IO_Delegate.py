@@ -155,26 +155,56 @@ class IO_Delegate(object):
         # remove last 10 items and return
         return s[:-10] 
     
+    
+    # Parse raw values from input into properly formatted morse code
     def RawToMorse(self, raw):
         m = ''
-        # split into words
-        for i in range(len(raw)):
+        i = 0
+        # '1'       = '•'
+        # '111'     = '−'
+        # '0'       = ' '
+        # '000'     = '   '
+        # '0000000' = '       ' 
+        while i < len(raw):
+            if raw[i] == '0':
+                m += ' '
+                i += 1
+                continue
+            # '1'
             if raw[i] == '1':
-                if raw[i+1] == '1' and raw[i+2] == '1':
+                # '111'
+                if ((i+2) < len(raw) and # check if in bounds
+                     raw[i+1] == '1' and raw[i+2] == '1'):
                     m += '−'
-                    i += 2 # consume two spots
-                    i += 1 # consume following 0
+#                    print(str.format("{0}, {1}: {2}", i, '111', '−'))  # trace
+                    i += 3 # consume two spots
+                    # Check for following zero
+#                    if (i+1) < len(raw) and raw[i+1] == '0':
+#                        i += 1 # consume following 0
                 else:
                     m += '•'
-                    i += 1 # consume following 0
-                m += ' '   # space between blips in char
-            if raw[i] == '0':
-                if raw[i+1] == '0' and raw[i+2] == '0':
-                    m += '  '  # add 2 spaces (assuming one already added) between char in word
-                    i += 2 # consume the two spaces
-                    if raw[i+3] == '0' and raw[i+4] == '0' and raw[i+5] == '0' and raw[i+6] == '0':
-                        m += '    '  # add 4 more spaces (7 total) between words
-                        i += 4 # consume the seven spaces
+                    i += 1
+#                    print(str.format("{0}, {1}: {2}", i, raw[i], '•'))  # trace
+#                    if (i+1) < len(raw) and raw[i+1] == '0':
+#                        i += 1 # consume following 0
+#                m += ' '   # space between blips in char
+#            else:# raw[i] == '0':
+#                m += ' '
+#                print(str.format("{0}, {1}: {2}", i, raw[i], '\' \''))  # trace
+                # '000'
+#                if ((i+2) < len(raw) and # check if in bounds
+#                     raw[i+1] == '0' and raw[i+2] == '0'):
+#                    m += '  '  # add 2 spaces (assuming one already added) between char in word
+#                    print(str.format("{0}, {1}: {2}", i, v, '\'   \''))  # trace
+#                    i += 2     # consume the two spaces
+#                    # '0000000'
+#                    if ((i+4) < len(raw) and # check if in bounds 
+#                        raw[i+1] == '0'  and raw[i+2] == '0' and   
+#                        raw[i+3] == '0'  and raw[i+4] == '0'
+#                        ):
+#                        m += '    '  # add 4 more spaces (7 total) between words
+#                        print(str.format("{0}, {1}: {2}", i, v, '\'       \''))  # trace
+#                        i += 4       # consume the seven spaces
             
             
 
