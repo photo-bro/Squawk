@@ -21,8 +21,26 @@
 ###################################################
 
 class Morse(object):
-
+    """
+    Class containing methods to convert plain text to and from morse code
+    Morse code class symbology:
+    Name  Symbol  Counts     Value
+    -------------------------------
+    Dot:   '•'    1 count     HIGH
+    Dash:  '−'    3 counts    HIGH
+    Space: ' '    1 count     LOW
+    -------------------------------
+        Space between each components of a character is one (1) count. The 
+    space between each character is three (3) counts. The space between
+    each word is seven (7) counts.
+    Credit:
+    http://morsecode.scphillips.com/morse2.html
+    """
+    
     def __init__(self):
+        """
+        Constructor
+        """
         self.MorseDict = {'a':'• −',     
                           'b':'− • • •',    
                           'c':'− • − •',    
@@ -73,6 +91,12 @@ class Morse(object):
 
     
     def TextToMorse(self, text):
+        """
+        Description: Convert 'text' into properly formatted morse code string
+        text (string): plain text string of characters
+        Return: (string) properly formatted morse code string. See class constructor
+            for specifics about symbology
+        """
         s = '' 
         # split message into words         
         for w in text.split():
@@ -90,6 +114,11 @@ class Morse(object):
     
     
     def MorseToText(self, msg):
+        """
+        Description: Convert properly formatted morse code string into plain text.
+        msg (string): properly formatted morse code string
+        Return: (string) translated plain text string
+        """
         s = ''
         # Split message into groups of individual words
         for w in msg.split('       '):  # 7 spaces between words
@@ -101,6 +130,13 @@ class Morse(object):
     
 
     def __MorseCharToText(self, char):
+        """
+        Private Function
+        Description: Reverse search dictionary to find plain text char from
+            morse code char.
+        char (string): morse code character
+        Return: (chr) translated plain text character
+        """
         # Find key from value in dictionary
         # Dictionary might not be the best data structure for this.... oh whale
         key = [k for k, v in self.MorseDict.items() if v == char]

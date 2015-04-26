@@ -25,25 +25,62 @@ import time, threading, os, sys
 from datetime import datetime
 
 # Local imports
-import Network_Delegate, IO_Delegate
-import CLI
+import IO_Delegate
 import Morse
 
-import pdb #debug
+#import pdb #debug
 
-################
-# Creates separate thread for user input to prevent blocking
-#
-# Concept and code credit:
-# http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
+class Graphics():
+    
+    def DrawMainMenu(self):
+        print("╔═══════════════════════════════════════════════════════════════════════════════════════════════╗")
+        print("║                  ███████╗ ██████╗ ██╗   ██╗ █████╗ ██╗    ██╗██╗  ██╗                         ║")
+        print("║                  ██╔════╝██╔═══██╗██║   ██║██╔══██╗██║    ██║██║ ██╔╝                         ║")
+        print("║                  ███████╗██║   ██║██║   ██║███████║██║ █╗ ██║█████╔╝                          ║")
+        print("║                  ╚════██║██║▄▄ ██║██║   ██║██╔══██║██║███╗██║██╔═██╗                          ║")
+        print("║                  ███████║╚██████╔╝╚██████╔╝██║  ██║╚███╔███╔╝██║  ██╗                         ║")
+        print("║                  ╚══════╝ ╚══▀▀═╝  ╚═════╝ ╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝  ╚═╝                         ║")
+        print("║                                                                                               ║")
+        print("║                     \"A morse code based peer to peer chat client\"                             ║")
+        print("║                                                                                               ║")
+        print("║                       Created by Josh Harmon                                                  ║")
+        print("╚═══════════════════════════════════════════════════════════════════════════════════════════════╝")
+    
+    def DrawInstructions(self):
+        print("██╗███╗   ██╗███████╗████████╗██████╗ ██╗   ██╗ ██████╗████████╗██╗ ██████╗ ███╗   ██╗███████╗")
+        print("██║████╗  ██║██╔════╝╚══██╔══╝██╔══██╗██║   ██║██╔════╝╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝██╗")
+        print("██║██╔██╗ ██║███████╗   ██║   ██████╔╝██║   ██║██║        ██║   ██║██║   ██║██╔██╗ ██║███████╗╚═╝")
+        print("██║██║╚██╗██║╚════██║   ██║   ██╔══██╗██║   ██║██║        ██║   ██║██║   ██║██║╚██╗██║╚════██║██╗")
+        print("██║██║ ╚████║███████║   ██║   ██║  ██║╚██████╔╝╚██████╗   ██║   ██║╚██████╔╝██║ ╚████║███████║╚═╝")
+        print("╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚══════╝   ")
+        print("Count Length: The number of seconds a dot (•) is held for. Values smaller than .05 do not ")
+        print("always work and behave unpredictably")
+        print("To exit, type \'quit\'")
+        print("═══════════════════════════════════════════════════════════════════════════════════════════════")
+
+        
+
 class InputThread(threading.Thread):
+    """
+    Class for creating separate thread for user input to prevent blocking
+    Concept and code credit:
+    http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
+    """
     def __init__(self, count = .5):
+        """
+        Constructor
+        count (float): length in seconds for one dot. Has to be same for all devices
+        """
         threading.Thread.__init__(self)
         self.running = 1
         self.IO = IO_Delegate.IO_Delegate(count)
         self.M = Morse.Morse()
     
     def run(self):
+        """
+        Description: User input loop. Prompt user for message and attempt
+            transmit message. "quit" will quit entire program
+        """
         while self.running:
             outMessage =  input("] ")
             if outMessage:       
@@ -62,6 +99,9 @@ class InputThread(threading.Thread):
             time.sleep(0.1)
                 
     def kill(self):
+        """
+        Destroy thread
+        """
         self.running = 0
 
 ################
@@ -70,13 +110,26 @@ class InputThread(threading.Thread):
 # Concept and code credit:
 # http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
 class ReceiveThread(threading.Thread):
+    """
+    Class for creating separate thread for printing incoming messages
+    Concept and code credit:
+    http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
+    """
     def __init__(self, count = .5):
+        """
+        Constructor
+        count (float): length in seconds for one dot. Has to be same for all devices
+        """
         threading.Thread.__init__(self)
         self.running = 1
         self.IO = IO_Delegate.IO_Delegate(count)
         self.M = Morse.Morse()
     
     def run(self):
+        """
+        Description: Loop and check for incoming message. Read message once input is 
+            detected. Print message to screen
+        """
         while self.running:
             # Check for messages
             inMorse = self.IO.ReceiveMorse()
@@ -89,19 +142,35 @@ class ReceiveThread(threading.Thread):
             time.sleep(0.1)       
     
     def kill(self):
+        """
+        Destroy thread
+        """
         self.running = 0
         
 def Program(self):
+    """
+    Program entry
+    Head of execution
+    """
     
     # Clear screen
     os.system("clear")
     
-    # Draw menu
-    CLI.UI().DrawMainMenu()
+    # Draw menu and instructions
+    Graphics.DrawMainMenu(self)
+    Graphics.DrawInstructions(self)
     
     # Request count length
-    count = input("Count Length: ")
-    
+    count = input("Count Length (in seconds): ")
+    # horrible loop for data validation
+    # couldn't think of a better solutio at the moment
+    while True:
+        try:
+            float(count)
+            break
+        except:
+            count = input("Count Length (in seconds): ")
+        
     # Init IO
     IO_Delegate.IO_Delegate().Setup()
             
@@ -119,7 +188,7 @@ def Program(self):
         time.sleep(5) # no need to tie up cpu resources
         pass
         
-    # kill threads    
+    # Kill threads    
     getMessages.kill()
     userInput.kill()
         

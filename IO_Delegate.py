@@ -26,39 +26,54 @@ import pifacedigitalio as pfio
 import time, os
 import Morse
 
-import pdb #debug
-
-
+#import pdb #debug
 
 
 class IO_Delegate(object):
+    """
+    Class containing  methods to transmit and receive morse code messages 
+    using a PiFaceDigitalIO board
+    """
 
     def __init__(self, count = .5, channel_out = 7, channel_in = 0):
-        # setup proper io system
-        #pfio.init()
-    
+        """
+        Description: Construct IO_Delegate object
+        count (float): length in seconds for one dot
+        channel_out (int): channel on PiFaceDigitalIO board for outputting morse
+        channel_in (int): channel on PiFaceDigitalIO board for incoming morse
+        """
         # class variables         
         self.count = count      # in seconds
         self.channel_out = channel_out  
         self.channel_in = channel_in
     
-        # Make sure output is low
-        #pfio.digital_write(self.channel_out, 1)
-    
     def Setup(self):
-        #   Not in constructor because it only needs to be called from the 
-        # first instance
+        """
+        Description: Initialize PiFaceDigitalIO. Can be called without 
+            creating an object. Should be called before attempts to 
+            output or receive data. Should only be called once
+        """
         pfio.init()
         pfio.digital_write(self.channel_out, 1)
     
     def Cleanup(self):
+        """
+        Destructor
+        Should be called before program termination
+        """
         pfio.deinit()
         
     # Best if run on separate thread 
     def SendMorse(self, msg):
-        # Make sure output is low
-        #pfio.digital_write(self.channel_out, 1)
-       
+        """
+        Description: Transmit Morse message over channel_out
+        msg (string): Morse code message to be transmitted. Should on contain:
+            ' ', '•', or '−'
+        An EOT morse char ('• • • − • −') is appended before transmission. 
+        NOTE: a prefix message of '• • •' is added due to issues with the first few 
+        dots/dashes being corrupted.
+        """
+        
         # add space to beginning of message to ensure data goes through
         # add  end transmission char to message
         msg = '• • •' + msg + '• • • − • −' 
@@ -80,6 +95,13 @@ class IO_Delegate(object):
         pfio.digital_write(self.channel_out, 1)
     
     def ReceiveMorse(self):
+        """
+        Description: Receive morse code message from channel_in. Function 
+            checks if EOT has been transmitted. If message contains EOT the 
+            morse message is returned without the EOT char. Else None is
+            returned.
+        Returns: (string) morse message or None if garage
+        """
         raw = self._GetRawMessage()
         m = self._RawToMorse(raw)
         # check if valid message (check EOT char)
@@ -89,6 +111,16 @@ class IO_Delegate(object):
             return None
     
     def _GetRawMessage(self):
+        """
+        Private Function
+        Description: On edge trigger, reads the value of channel_in one time every
+            count seconds and adds that value to a buffer. End of message is 
+            determined when 10 counts of low ('0') have been consecutively read.
+            Beginning of message should contain 6 garage values used to stabilize
+            output stream. Low is recorded as '0' and high as '1'
+        Return: (string) buffer of values on channel_in once edge triggered. First
+            six (6) items and last ten (10) items have been removed before return.
+        """
         receiving = True
         s = ''
         # Start at edge trigger
@@ -115,11 +147,19 @@ class IO_Delegate(object):
     
     # Parse raw values from input into properly formatted morse code
     def _RawToMorse(self, raw):
-        m = ''
+        """
+        Private Function
+        Description: Parse return from _GetRawMessage into proper morse code:
+            Grammar:
+            '1'       = '•'
+            '111'     = '−'
+            '0'       = ' '
+        raw (string): string containing on the chars '0' and '1'
+        Return: (string) containing the proper morse code message from 
+            _GetRawMessage.
+        """
+        m = ''      
         i = 0
-        # '1'       = '•'
-        # '111'     = '−'
-        # '0'       = ' '
         while i < len(raw):
             if raw[i] == '0':
                 m += ' '
