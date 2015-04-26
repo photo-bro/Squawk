@@ -92,9 +92,12 @@ class Morse(object):
     def MorseToText(self, msg):
         s = ''
         # Split message into groups of individual words
+        print(msg)  #trace
         for w in msg.split('       '):  # 7 spaces between words
+            print(w) #trace
             # Split word into groups of individual chars
             for c in w.split('   '):    # 3 spaces between chars
+                print(c) #trace
                 s += self.__MorseCharToText(c)    
         return s    
     
@@ -102,8 +105,5 @@ class Morse(object):
     def __MorseCharToText(self, char):
         # Find key from value in dictionary
         # Dictionary might not be the best data structure for this.... oh whale
-        for k, v in self.MorseDict.items():
-            if char == v:
-                return k
-            else:
-                return ""
+        key = [k for k, v in self.MorseDict.items() if v == char]
+        return key[0]

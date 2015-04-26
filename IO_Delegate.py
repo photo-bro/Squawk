@@ -68,7 +68,7 @@ class IO_Delegate(object):
                     GPIO.output(self.channel_out, True) if (self.mode == "gp") else pfio.digital_write(self.channel_out, 0)
                     time.sleep(3 * self.count)
                 elif c == ' ':  # 1 count for space
-                    time.sleep(7 * self.count)
+                    time.sleep(1 * self.count)
                 else:
                     pass
                 GPIO.output(self.channel_out, False) if (self.mode == "gp") else pfio.digital_write(self.channel_out, 1)
@@ -176,60 +176,10 @@ class IO_Delegate(object):
                 if ((i+2) < len(raw) and # check if in bounds
                      raw[i+1] == '1' and raw[i+2] == '1'):
                     m += '−'
-#                    print(str.format("{0}, {1}: {2}", i, '111', '−'))  # trace
-                    i += 3 # consume two spots
-                    # Check for following zero
-#                    if (i+1) < len(raw) and raw[i+1] == '0':
-#                        i += 1 # consume following 0
+                    i += 3 # consume three spots
                 else:
                     m += '•'
-                    i += 1
-#                    print(str.format("{0}, {1}: {2}", i, raw[i], '•'))  # trace
-#                    if (i+1) < len(raw) and raw[i+1] == '0':
-#                        i += 1 # consume following 0
-#                m += ' '   # space between blips in char
-#            else:# raw[i] == '0':
-#                m += ' '
-#                print(str.format("{0}, {1}: {2}", i, raw[i], '\' \''))  # trace
-                # '000'
-#                if ((i+2) < len(raw) and # check if in bounds
-#                     raw[i+1] == '0' and raw[i+2] == '0'):
-#                    m += '  '  # add 2 spaces (assuming one already added) between char in word
-#                    print(str.format("{0}, {1}: {2}", i, v, '\'   \''))  # trace
-#                    i += 2     # consume the two spaces
-#                    # '0000000'
-#                    if ((i+4) < len(raw) and # check if in bounds 
-#                        raw[i+1] == '0'  and raw[i+2] == '0' and   
-#                        raw[i+3] == '0'  and raw[i+4] == '0'
-#                        ):
-#                        m += '    '  # add 4 more spaces (7 total) between words
-#                        print(str.format("{0}, {1}: {2}", i, v, '\'       \''))  # trace
-#                        i += 4       # consume the seven spaces
-            
-            
-
-
-#        for w in raw.split('0000000'):
-#            # split into chars
-#            for c in w.split('000'):
-#                # split into blips
-#                for i in range(len(c)):
-#                    if c[i] == '1':
-#                        if (i+2) < len(c) and c[i+1] == '1' and c[i+2] == '1':
-#                            m += '−'
-#                            # one space between each blip in a char
-#                            # unless at end of char
-##                            if (i+5) < len(c) and c[i+5] != '0':
-##                                m += ' ' # one space between each blip in a char
-#                            i += 2   # skip over next 2 blips
-#                            continue
-#                        m += '•'
-#                        # one space between each blip in a char
-#                        # unless at end of char
-##                        if (i+3) < len(c) and c[i+3] != '0':
-##                            m += ' '                              
-#                m += '  '  # three spaces between chars
-#            m += '       ' # seven spaces between words
+                    i += 1 # consume spot2
         return m
         
     
