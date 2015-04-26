@@ -55,7 +55,7 @@ class InputThread(threading.Thread):
                 try:
                     #pdb.set_trace()
                     morse = self.M.TextToMorse(outMessage)
-                    print(str.format("Sending message: {0}", morse))
+                    print(str.format("Sending message: {0} => {1}", outMessage, morse))
                     self.IO.SendMorse(morse)
                 except:
                     Exception
@@ -81,10 +81,9 @@ class ReceiveThread(threading.Thread):
             # Check for messages
             inMorse = self.IO.ReceiveMorse()
             if inMorse != None:
-                # print Peer information and message received time
                 ct = datetime.today().time()
                 msg = self.M.MorseToText(inMorse)
-                print(str.format("{0}: {1}\n= {2}", ct, inMorse, msg))
+                print(str.format("\n{0}:{1}:{2} : {3} = {4}", ct.hour, ct.minute, ct.second, inMorse, msg))
             time.sleep(0.1)       
     
     def kill(self):
@@ -101,19 +100,24 @@ def Program(self):
     # print(str.format("Active Threads: {0}", threading.active_count())) # trace
         
     # Setup message retrieve thread
-#    getMessages = ReceiveThread()
-#    getMessages.start()
+    getMessages = ReceiveThread()
+    getMessages.start()
     
     # Test message for receive thread TRACE
-    io = IO_Delegate.IO_Delegate()
-    m = Morse.Morse()
-    # io.SendMorse(m.TextToMorse("Hello")) # Trace
-    msg = m.MorseToText('• • • •   •   • − • •   • − • •   − − −')
-    print(msg)
+#    io = IO_Delegate.IO_Delegate()
+#    m = Morse.Morse()
+#    io.SendMorse(m.TextToMorse("Hello")) # Trace
+#    msg = m.MorseToText('• − −   • • • •   • −   −          • •   • • •          • − • •   − − −   • • • −   •')
+#    print('• − −   • • • •   • −   −          • •   • • •          • − • •   − − −   • • • −   •')
+#    print(              '10111011100010101010001011100011100000001010001010100000001011101010001110111011100010101011100010')
+#    print(io.RawToMorse('10111011100010101010001011100011100000001010001010100000001011101010001110111011100010101011100010'))
+#    print(msg)
+#    quit()
+
     
     # Setup input thread
-#    userInput = InputThread()
-#    userInput.start()
+    userInput = InputThread()
+    userInput.start()
     
     # print(str.format("Active Threads: {0}", threading.active_count())) # trace
     

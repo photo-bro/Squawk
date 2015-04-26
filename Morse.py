@@ -85,20 +85,18 @@ class Morse(object):
                     # invalid letter, assume blank
                     pass
             # 7 spaces (each space is 1 count) between words
-            s += '       ' 
+            s += '    ' 
         return s
     
     
     def MorseToText(self, msg):
         s = ''
         # Split message into groups of individual words
-        print(msg)  #trace
         for w in msg.split('       '):  # 7 spaces between words
-            print(w) #trace
             # Split word into groups of individual chars
             for c in w.split('   '):    # 3 spaces between chars
-                print(c) #trace
                 s += self.__MorseCharToText(c)    
+            s += ' ' # space between words
         return s    
     
 
@@ -106,4 +104,7 @@ class Morse(object):
         # Find key from value in dictionary
         # Dictionary might not be the best data structure for this.... oh whale
         key = [k for k, v in self.MorseDict.items() if v == char]
-        return key[0]
+        if key:
+            return key[0]
+        else:
+            return ''
