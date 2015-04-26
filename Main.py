@@ -31,7 +31,9 @@ import Morse
 #import pdb #debug
 
 class Graphics():
-    
+    """
+    Class containing menus to be printed and color codes
+    """
     def DrawMainMenu(self):
         print("╔═══════════════════════════════════════════════════════════════════════════════════════════════╗")
         print("║                  ███████╗ ██████╗ ██╗   ██╗ █████╗ ██╗    ██╗██╗  ██╗                         ║")
@@ -58,7 +60,18 @@ class Graphics():
         print("To exit, type \'quit\'")
         print("═══════════════════════════════════════════════════════════════════════════════════════════════")
 
-        
+    # http://stackoverflow.com/questions/8924173/how-do-i-print-bold-text-in-python
+    class color:
+        PURPLE = '\033[95m'
+        CYAN = '\033[96m'
+        DARKCYAN = '\033[36m'
+        BLUE = '\033[94m'
+        GREEN = '\033[92m'
+        YELLOW = '\033[93m'
+        RED = '\033[91m'
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+        END = '\033[0m'
 
 class InputThread(threading.Thread):
     """
@@ -82,7 +95,7 @@ class InputThread(threading.Thread):
             transmit message. "quit" will quit entire program
         """
         while self.running:
-            outMessage =  input("] ")
+            outMessage =  input("")
             if outMessage:       
                 # easy exit    
                 if outMessage == "quit":
@@ -91,9 +104,10 @@ class InputThread(threading.Thread):
                 try:
                     #pdb.set_trace()
                     morse = self.M.TextToMorse(outMessage)
-                    print(str.format("Sending message: {0} => {1}", outMessage, morse))
+                    print(str.format("{2}Sending message: {0} => {1}{3}", outMessage, morse, 
+                                     Graphics.color.BOLD, Graphics.color.END))
                     self.IO.SendMorse(morse)
-                    print("Sent.")
+                    print(str.format("{0}Sent.{1}", Graphics.color.BOLD, Graphics.color.END))
                 except:
                     Exception
             time.sleep(0.1)
@@ -136,8 +150,10 @@ class ReceiveThread(threading.Thread):
             if inMorse != None:
                 ct = datetime.today().time()
                 msg = self.M.MorseToText(inMorse)
+                print(Graphics.color.BOLD)
                 print(str.format("\nReceived Message at {0}:{1}:{2} : {3} \nMessage: {4}", 
                                  ct.hour, ct.minute, ct.second, inMorse, msg.upper()))
+                print(Graphics.color.END)
                 sys.stdout.flush()
             time.sleep(0.1)       
     
@@ -157,19 +173,22 @@ def Program(self):
     os.system("clear")
     
     # Draw menu and instructions
+    print(Graphics.color.RED)
     Graphics.DrawMainMenu(self)
+    print(Graphics.color.BLUE)
     Graphics.DrawInstructions(self)
+    print(Graphics.color.END)
     
     # Request count length
-    count = input("Count Length (in seconds): ")
+    count = input(str.format("{0}Count Length (in seconds):{1} ", Graphics.color.BOLD, Graphics.color.END))
     # horrible loop for data validation
-    # couldn't think of a better solutio at the moment
+    # couldn't think of a better solution at the moment
     while True:
         try:
             float(count)
             break
         except:
-            count = input("Count Length (in seconds): ")
+            count = input(str.format("{0}Count Length (in seconds):{1} ", Graphics.color.BOLD, Graphics.color.END))
         
     # Init IO
     IO_Delegate.IO_Delegate().Setup()
