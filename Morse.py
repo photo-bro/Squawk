@@ -105,7 +105,7 @@ class Morse(object):
                 try:
                     s += self.MorseDict[c]
                     s += '   '  # 3 spaces between characters in a word
-                except e:
+                except:
                     # invalid letter, assume blank
                     pass
             # 7 spaces (each space is 1 count) between words

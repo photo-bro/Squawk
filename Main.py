@@ -62,16 +62,16 @@ class Graphics():
 
     # http://stackoverflow.com/questions/8924173/how-do-i-print-bold-text-in-python
     class color:
-        PURPLE = '\033[95m'
-        CYAN = '\033[96m'
-        DARKCYAN = '\033[36m'
-        BLUE = '\033[94m'
-        GREEN = '\033[92m'
-        YELLOW = '\033[93m'
-        RED = '\033[91m'
-        BOLD = '\033[1m'
+        PURPLE    = '\033[95m'
+        CYAN      = '\033[96m'
+        DARKCYAN  = '\033[36m'
+        BLUE      = '\033[94m'
+        GREEN     = '\033[92m'
+        YELLOW    = '\033[93m'
+        RED       = '\033[91m'
+        BOLD      = '\033[1m'
         UNDERLINE = '\033[4m'
-        END = '\033[0m'
+        END       = '\033[0m'
 
 class InputThread(threading.Thread):
     """
@@ -110,7 +110,7 @@ class InputThread(threading.Thread):
                     print(str.format("{0}Sent.{1}", Graphics.color.BOLD, Graphics.color.END))
                 except:
                     Exception
-            time.sleep(0.1)
+            time.sleep(0.5)
                 
     def kill(self):
         """
@@ -155,7 +155,7 @@ class ReceiveThread(threading.Thread):
                                  ct.hour, ct.minute, ct.second, inMorse, msg.upper()))
                 print(Graphics.color.END)
                 sys.stdout.flush()
-            time.sleep(0.1)       
+            time.sleep(0.5)       
     
     def kill(self):
         """
@@ -193,7 +193,7 @@ def Program(self):
     # Init IO
     IO_Delegate.IO_Delegate().Setup()
             
-    # Setup message retrieve thread
+    # Setup message receive thread
     getMessages = ReceiveThread(float(count))
     getMessages.start()
     

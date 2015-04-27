@@ -28,7 +28,6 @@ import Morse
 
 #import pdb #debug
 
-
 class IO_Delegate(object):
     """
     Class containing  methods to transmit and receive morse code messages 
@@ -76,7 +75,6 @@ class IO_Delegate(object):
         
         # add space to beginning of message to ensure data goes through
         # add  end transmission char to message
-#        msg = '• • •' + msg + '• • • - • -' 
         msg += '• • • - • -'
         for c in msg:
             if c == '•':  # On for 1 count
@@ -161,16 +159,21 @@ class IO_Delegate(object):
         while pfio.digital_read(self.channel_in) == 1:
             pfio.digital_read(self.channel_in)
         
-        # set current state
+        # This makes this class more coupled but I like the feature
+        print("Receiving message...")
+        
+        # set current state (1 if hi, 0 if low)
         state = 0
         
         # Start high timer
         hiTimeStart = time.time()
 
         while (dur < 10 * self.count):
+            # Main loop timer
             start = time.time()
             if state == 0: # state is high
                 # edge trigger to low
+                # edge trigger loop timer
                 eT = time.time()
                 while pfio.digital_read(self.channel_in) == 0:
                      pfio.digital_read(self.channel_in)
@@ -185,6 +188,7 @@ class IO_Delegate(object):
                     s += '1'
             else:
                 # edge trigger to hi
+                # edge trigger loop timer
                 eT = time.time()
                 while pfio.digital_read(self.channel_in) == 1:
                      pfio.digital_read(self.channel_in)
