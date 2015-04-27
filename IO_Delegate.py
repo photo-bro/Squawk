@@ -68,20 +68,21 @@ class IO_Delegate(object):
         """
         Description: Transmit Morse message over channel_out
         msg (string): Morse code message to be transmitted. Should on contain:
-            ' ', '•', or '−'
-        An EOT morse char ('• • • − • −') is appended before transmission. 
+            ' ', '•', or '-'
+        An EOT morse char ('• • • - • -') is appended before transmission. 
         NOTE: a prefix message of '• • •' is added due to issues with the first few 
         dots/dashes being corrupted.
         """
         
         # add space to beginning of message to ensure data goes through
         # add  end transmission char to message
-        msg = '• • •' + msg + '• • • − • −' 
+#        msg = '• • •' + msg + '• • • - • -' 
+        msg += '• • • - • -'
         for c in msg:
             if c == '•':  # On for 1 count
                 pfio.digital_write(self.channel_out, 0)
                 time.sleep(1 * self.count)
-            elif c == '−':  # On for 3 count
+            elif c == '-':  # On for 3 count
                 pfio.digital_write(self.channel_out, 0)
                 time.sleep(3 * self.count)
             elif c == ' ':  # 1 count for space
@@ -102,10 +103,11 @@ class IO_Delegate(object):
             returned.
         Returns: (string) morse message or None if garage
         """
-        raw = self._GetRawMessage()
+        raw = self._GetRawMessage2()
         m = self._RawToMorse(raw)
+        print(m)  #trace
         # check if valid message (check EOT char)
-        if m[-11:] == '• • • − • −':
+        if m[-11:] == '• • • - • -':
             return m[:-11] # return without EOT char
         else:
             return None
@@ -126,7 +128,6 @@ class IO_Delegate(object):
         # Start at edge trigger
         while pfio.digital_read(self.channel_in) == 1:
             pfio.digital_read(self.channel_in)
-            #time.sleep(self.count / 10)    # delay loop slightly
             
         # Check every count if hi or low
         while receiving:
@@ -145,6 +146,55 @@ class IO_Delegate(object):
         # remove last 10 items and return
         return s[6:-10] 
     
+    def _GetRawMessage2(self):
+        s = ''
+        dur = 0
+        # Start at edge trigger
+        while pfio.digital_read(self.channel_in) == 1:
+            pfio.digital_read(self.channel_in)
+        print("Initial Trigger") # trace
+        
+        state = 0
+        # Start high timer
+        hiTimeStart = time.time()
+
+        while (dur < 10 * self.count):
+            start = time.time()
+            if state == 0: # state is high
+                # edge trigger to low
+                eT = time.time()
+                while pfio.digital_read(self.channel_in) == 0:
+                     pfio.digital_read(self.channel_in)
+                     if (time.time() - eT > 10 * self.count):
+                        break
+                # Start low timer, end high timer
+                lowTimeStart = hiTimeEnd = time.time()
+                # Switch state
+                state = 1
+                # Add values
+                for i in range(round((hiTimeEnd - hiTimeStart) / self.count)):
+                    s += '1'
+            else:
+                # edge trigger to hi
+                eT = time.time()
+                while pfio.digital_read(self.channel_in) == 1:
+                     pfio.digital_read(self.channel_in)
+                     if (time.time() - eT > 10 * self.count):
+                        break
+                # Start high timer, end low timer
+                hiTimeStart = lowTimeEnd = time.time()
+                # Switch state
+                state = 0
+                # Add values
+                for i in range(round((lowTimeEnd - lowTimeStart) / self.count)):
+                    s += '0'
+            # exit if too long pause
+            dur = time.time() - start
+        # remove last 10 items and return
+        print(s[5:]) #trace
+#        print(s[6:]) #trace
+        return s[5:-10] 
+        
     # Parse raw values from input into properly formatted morse code
     def _RawToMorse(self, raw):
         """
@@ -152,7 +202,7 @@ class IO_Delegate(object):
         Description: Parse return from _GetRawMessage into proper morse code:
             Grammar:
             '1'       = '•'
-            '111'     = '−'
+            '111'     = '-'
             '0'       = ' '
         raw (string): string containing on the chars '0' and '1'
         Return: (string) containing the proper morse code message from 
@@ -170,7 +220,7 @@ class IO_Delegate(object):
                 # '111'
                 if ((i+2) < len(raw) and # check if in bounds
                      raw[i+1] == '1' and raw[i+2] == '1'):
-                    m += '−'
+                    m += '-'
                     i += 3 # consume three spots
                 else:
                     m += '•'
