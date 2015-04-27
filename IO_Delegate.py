@@ -200,7 +200,7 @@ class IO_Delegate(object):
             # exit if too long pause
             dur = time.time() - start
         # remove last 10 items (excess zeros) and return
-        return s[5:-10] 
+        return s[-10] 
         
     # Parse raw values from input into properly formatted morse code
     def _RawToMorse(self, raw):
