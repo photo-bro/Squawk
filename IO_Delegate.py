@@ -105,7 +105,6 @@ class IO_Delegate(object):
         """
         raw = self._GetRawMessage2()
         m = self._RawToMorse(raw)
-        print(m)  #trace
         # check if valid message (check EOT char)
         if m[-11:] == '• • • - • -':
             return m[:-11] # return without EOT char
@@ -114,6 +113,8 @@ class IO_Delegate(object):
     
     def _GetRawMessage(self):
         """
+        DEPRECATED
+        REQUIRES ReceiveMorse() TO BE UPDATED TO REUSE
         Private Function
         Description: On edge trigger, reads the value of channel_in one time every
             count seconds and adds that value to a buffer. End of message is 
@@ -147,14 +148,22 @@ class IO_Delegate(object):
         return s[6:-10] 
     
     def _GetRawMessage2(self):
+        """
+        Private Function
+        Description: On initial edge trigger, measures how many counts channel_in 
+            is high or low
+        Return: (string) buffer of values (low = '0', high = '1') from channel_in 
+            once edge triggered. 
+        """
         s = ''
         dur = 0
         # Start at edge trigger
         while pfio.digital_read(self.channel_in) == 1:
             pfio.digital_read(self.channel_in)
-        print("Initial Trigger") # trace
         
+        # set current state
         state = 0
+        
         # Start high timer
         hiTimeStart = time.time()
 
@@ -190,9 +199,7 @@ class IO_Delegate(object):
                     s += '0'
             # exit if too long pause
             dur = time.time() - start
-        # remove last 10 items and return
-        print(s[5:]) #trace
-#        print(s[6:]) #trace
+        # remove last 10 items (excess zeros) and return
         return s[5:-10] 
         
     # Parse raw values from input into properly formatted morse code
