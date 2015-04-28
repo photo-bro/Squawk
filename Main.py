@@ -118,11 +118,6 @@ class InputThread(threading.Thread):
         """
         self.running = 0
 
-################
-# Creates separate thread for printing incoming messages
-#
-# Concept and code credit:
-# http://code.activestate.com/recipes/578591-primitive-peer-to-peer-chat/
 class ReceiveThread(threading.Thread):
     """
     Class for creating separate thread for printing incoming messages
