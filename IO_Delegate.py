@@ -67,10 +67,8 @@ class IO_Delegate(object):
         """
         Description: Transmit Morse message over channel_out
         msg (string): Morse code message to be transmitted. Should on contain:
-            ' ', '•', or '-'
-        An EOT morse char ('• • • - • -') is appended before transmission. 
-        NOTE: a prefix message of '• • •' is added due to issues with the first few 
-        dots/dashes being corrupted.
+            ' ', '•', or '-', An EOT morse char ('• • • - • -') is appended 
+            before transmission. 
         """
         
         # add space to beginning of message to ensure data goes through
@@ -101,7 +99,7 @@ class IO_Delegate(object):
             returned.
         Returns: (string) morse message or None if garage
         """
-        raw = self._GetRawMessage2()
+        raw = self._GetRawMessage()
         m = self._RawToMorse(raw)
         # check if valid message (check EOT char)
         if m[-11:] == '• • • - • -':
@@ -109,7 +107,7 @@ class IO_Delegate(object):
         else:
             return None
     
-    def _GetRawMessage(self):
+    def _GetRawMessageOld(self):
         """
         DEPRECATED
         REQUIRES ReceiveMorse() TO BE UPDATED TO REUSE
@@ -145,7 +143,7 @@ class IO_Delegate(object):
         # remove last 10 items and return
         return s[6:-10] 
     
-    def _GetRawMessage2(self):
+    def _GetRawMessage(self):
         """
         Private Function
         Description: On initial edge trigger, measures how many counts channel_in 
